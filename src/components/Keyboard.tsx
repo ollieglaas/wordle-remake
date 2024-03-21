@@ -40,9 +40,6 @@ const Keyboard = ({
           {key.split("").map((letter) => (
             <button
               key={letter}
-              // className={`w-14 h-14 m-1 border border-${
-              //   isWrongKey(letter) ? "[#2e2e2e]" : "[#E2E2E2]"
-              // } rounded-xl hover:bg-[#777777] hover:border-[#777777] transition-all`}
               className={`w-14 h-14 m-1 ${getBackground(letter)} rounded ${
                 keyPressed === letter &&
                 guessText.length !== 5 &&

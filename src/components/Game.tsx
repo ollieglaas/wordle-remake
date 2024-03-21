@@ -193,7 +193,7 @@ const Game = ({ gameStats, setGameStats }: GameProps) => {
       setGameOver(true);
       setPlayerWon(true);
       incrementWinCount();
-    } else if (guessCount === 4 && !allCorrect) {
+    } else if (guessCount === 4) {
       setGameOver(true);
       incrementLoseCount();
     }
