@@ -115,11 +115,7 @@ const Game = ({ gameStats, setGameStats }: GameProps) => {
       setCorrectWord(correctWord);
     };
 
-    try {
-      fetchRandomWord();
-    } catch (error) {
-      console.log(error);
-    }
+    fetchRandomWord();
   }, [gameStats.gameCount]);
 
   function handleSubmit(e: React.FormEvent) {
@@ -136,6 +132,15 @@ const Game = ({ gameStats, setGameStats }: GameProps) => {
     setGuessText("");
   }
 
+  // stores status of key to be sent to keyboard component
+  function storeKeyStatus(keyColor: keyof KeyStatus, guessLetter: string) {
+    setKeyStatus((prevKeyStatus) => {
+      const updatedKeyStatus = { ...prevKeyStatus };
+      updatedKeyStatus[keyColor] = [...updatedKeyStatus[keyColor], guessLetter];
+      return updatedKeyStatus;
+    });
+  }
+
   function checkGuess(updatedGuesses: Guess[]) {
     const updatedGuessesWithColors = updatedGuesses.map((guess) => {
       const updatedCorrectWord = guess.correctWord.map((item) => ({ ...item }));
@@ -143,38 +148,19 @@ const Game = ({ gameStats, setGameStats }: GameProps) => {
       guess.splitGuess.forEach((guessLetter, index) => {
         const correctLetter = updatedCorrectWord[index].letter;
 
+        // determines the status of each letter
         if (correctLetter === guessLetter) {
           updatedCorrectWord[index].status = "green";
+          storeKeyStatus("greenKeys", guessLetter);
         } else if (
           guess.correctWord.some((letter) => letter.letter === guessLetter)
         ) {
           updatedCorrectWord[index].status = "yellow";
+          storeKeyStatus("yellowKeys", guessLetter);
         } else {
           updatedCorrectWord[index].status = "white";
+          storeKeyStatus("wrongKeys", guessLetter);
         }
-        // purpose is to store key status for keyboard sake
-        setKeyStatus((prevKeyStatus) => {
-          const updatedKeyStatus = { ...prevKeyStatus };
-
-          if (updatedCorrectWord[index].status === "green") {
-            updatedKeyStatus.greenKeys = [
-              ...updatedKeyStatus.greenKeys,
-              guessLetter,
-            ];
-          } else if (updatedCorrectWord[index].status === "yellow") {
-            updatedKeyStatus.yellowKeys = [
-              ...updatedKeyStatus.yellowKeys,
-              guessLetter,
-            ];
-          } else if (updatedCorrectWord[index].status === "white") {
-            updatedKeyStatus.wrongKeys = [
-              ...updatedKeyStatus.wrongKeys,
-              guessLetter,
-            ];
-          }
-
-          return updatedKeyStatus;
-        });
       });
 
       return {
@@ -210,38 +196,6 @@ const Game = ({ gameStats, setGameStats }: GameProps) => {
           playerWon={playerWon}
           gameOver={gameOver}
         />
-        {/* <form
-          onSubmit={handleSubmit}
-          className=" w-1/5 flex flex-row justify-evenly items-center mb-5"
-        >
-          <Input
-            type="text"
-            className="p-4"
-            maxLength={5}
-            placeholder="Enter a word"
-            value={guessText}
-            onChange={(e) => setGuessText(e.target.value.toUpperCase())}
-            size="lg"
-            disabled={playerWon || gameOver}
-            onKeyDown={(e) => setKeyPressed(e.key.toUpperCase())}
-            onKeyUp={() => setKeyPressed("")}
-          />
-          <Button
-            type="submit"
-            disabled={playerWon || gameOver || guessText.length !== 5}
-            className="p-2"
-            size="lg"
-          >
-            Go
-          </Button>
-        </form> */}
-        {/* <LetterInput
-          sequence={guessText}
-          setSequence={setGuessText}
-          handleSubmit={handleSubmit}
-          playerWon={playerWon}
-          gameOver={gameOver}
-        /> */}
       </div>
       {guesses.length > 0 && (
         <div className="flex flex-col justify-center items-center">
